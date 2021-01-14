@@ -1,0 +1,115 @@
+# Namespace for the deployment
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: samtholiya
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: samtholiya
+  name: analyser-service
+  labels:
+    app: analyser-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analyser-service
+  template:
+    metadata:
+      labels:
+        app: analyser-service
+    spec:
+      containers:
+      - name: analyser-service
+        image: samtholiya/analyser-service:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analyser-service
+  namespace: samtholiya
+spec:
+  selector:
+    app: analyser-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyser-ui-service
+  namespace: samtholiya
+  labels:
+    app: analyser-ui-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analyser-ui-service
+  template:
+    metadata:
+      labels:
+        app: analyser-ui-service
+    spec:
+      containers:
+      - name: analyser-ui-service
+        image: samtholiya/analyser-ui-service:latest
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analyser-ui-service
+  namespace: samtholiya
+spec:
+  selector:
+    app: analyser-ui-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyser-nginx
+  namespace: samtholiya
+  labels:
+    app: analyser-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analyser-nginx
+  template:
+    metadata:
+      labels:
+        app: analyser-nginx
+    spec:
+      containers:
+      - name: analyser-nginx
+        image: samtholiya/analyser-nginx:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analyser-nginx
+  namespace: samtholiya
+spec:
+  type: NodePort
+  selector:
+    app: analyser-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
